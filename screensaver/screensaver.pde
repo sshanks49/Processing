@@ -7,6 +7,7 @@ int[][] c = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {
 int[] m = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int[] r = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int[] kills = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int[] karma = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 String[] names = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""};
 //background
 int[] bv = {1, 1, 1};
@@ -16,47 +17,66 @@ String[] vowels = {"a", "a", "a", "e", "e","e","i","i","o","o","o","u","u","y","
 String[] consonants = {"b","c","d","f","g","h","j","k","l","m","n","p","qu","r","s","t","v","w","x","y","z","br","bs","cr","ch","cs","cl","dr","ds","fr","ft","fs","cl","gr","cl","gs","gt","kl","ks","nt","pr","ps","pt","ph","pz","py","rr","rt","ry","rp","st","ss","sp","sl","sy","sw","tr","tt","tl","tz","ty","th","vr","wr","xy","g'l","kk","t","b","r","c","s","ps","pt","nn","p","ñ","ç","ß"};
 int dir = 1;
 int start = 0;
-int end = 40;
+int end = 20;
 int boardlen = 5;
+StringList events = new StringList();
 void setup() {
   fullScreen();
   //size(1920,1080);
-  print("Hello world");
-  for (int i = 0; i < p.length; i++){
-    r[i] = 25 + int(random(-10, 10));
-    p[i][0] = int(random(r[i], width-r[i]));
-    p[i][1] = int(random(r[i], height-r[i]));
-    c[i][0] = int(random(255));
-    c[i][1] = int(random(255));
-    c[i][2] = int(random(255));
-    //m[i] = int(random(9))+1;
-    m[i] = 1;
-    int nl = int(random(2, 5));
-    for (int j = 0; j < nl; j++){
-      names[i] += j%2==0?consonants[int(random(consonants.length))] : vowels[int(random(vowels.length))];;
-    }  
+  int change = int(random(-6, 6));
+  print(change);
+  end += change;
+  if (end < 2) end = 2;
+  if (end > p.length) end = p.length;
+  for (int i = 0; i < end; i++){
+    if (kills[i] != 0) {
+      karma[i] += 1;
+      kills[i] -= 1;
+    } else {
+      p[i][0] = int(random(r[i], width-r[i]));
+      p[i][1] = int(random(r[i], height-r[i]));
+      c[i][0] = int(random(255));
+      c[i][1] = int(random(255));
+      c[i][2] = int(random(255));
+      //m[i] = int(random(9))+1;
+      m[i] = 1;
+      names[i] = "";
+      int nl = int(random(2, 5));
+      for (int j = 0; j < nl; j++){
+        names[i] += j%2==0?consonants[int(random(consonants.length))] : vowels[int(random(vowels.length))];;
+      }
+    }
+    r[i] = 20 + int(random(-10, 10)) + karma[i];
+    
   }
   rectMode(CENTER);
+  events.clear();
 }
 
 void draw() {
   background(b[0], b[1], b[2]);
+  //noStroke();
   massRot();
   nv = v;
   dir = -dir;
-  start = dir == 1 ? 0 : p.length - 1;
-  for (int i = start; dir == 1 ? i < p.length : i > -1; i+=dir){
+  start = dir == 1 ? 0 : end - 1;
+  if(count() == 1) setup();
+  textSize(11);
+  for (int i = start; dir == 1 ? i < end : i > -1; i+=dir){
     if (r[i] > 0){
       noStroke();
       fill(255-b[0], 255-b[1], 255-b[2], 128);
-      ellipse(p[i][0], p[i][1], (r[i]+kills[i]*2)*2, (r[i]+kills[i]*2)*2);
+      ellipse(p[i][0], p[i][1], (r[i]+kills[i]*2+karma[i]*2)*2, (r[i]+kills[i]*2+karma[i]*2)*2);
+      fill(255-c[i][0], 255-c[i][1], 255-c[i][2]);
+      ellipse(p[i][0], p[i][1], (r[i]+karma[i]*2)*2, (r[i]+karma[i]*2)*2);
       stroke(0);
       fill(c[i][0], c[i][1], c[i][2]);
       ellipse(p[i][0], p[i][1], r[i]*2, r[i]*2);
       fill(0);
       fill(255-c[i][0], 255-c[i][1], 255-c[i][2]);
       if (r[i] != 0) text(names[i]+","+r[i]+","+kills[i], p[i][0], p[i][1]);
-      for (int j = start; dir == 1 ? j < p.length : j > -1; j+=dir){
+      m[i] = kills[i] + 1;
+      for (int j = start; dir == 1 ? j < end : j > -1; j+=dir){
         if (j != i && r[j] != 0) {
           bounce(i, j);
           colorBounce(i, j);
@@ -66,22 +86,22 @@ void draw() {
       if (p[i][0]+r[i] + v[i][0]*m[i] > width){ 
         v[i][0] = -1;
         //m[i] = int(random(2)*m[i]+1);
-        m[i]++;
+        //m[i]++;
       }
       if (p[i][0]-r[i] + v[i][0]*m[i] < 0){ 
         v[i][0] = 1;
         //m[i] = int(random(2)*m[i]+1);
-        m[i]++;
+        //m[i]++;
       }
       if (p[i][1]+r[i] + v[i][1]*m[i] > height){ 
         v[i][1] = -1;
         //m[i] = int(random(2)*m[i]+1);
-        m[i]++;
+        //m[i]++;
       }
       if (p[i][1]-r[i] + v[i][1]*m[i] < 0){ 
         v[i][1] = 1;
         //m[i] = int(random(2)*m[i]+1);
-        m[i]++;
+        //m[i]++;
       }
     }
   }
@@ -110,6 +130,7 @@ void draw() {
   b[1] += bv[1];
   b[2] += bv[2];
   fill(255-b[0], 255-b[1], 255-b[2]);
+  textSize(14);
   text(count(), width/2, height/2);
   String[] killcount = rank(kills, boardlen);
   text("Kills", 5, 15);
@@ -120,6 +141,9 @@ void draw() {
   text("Speed", 1800, 15);
   String[] speedcount = rank(m, boardlen);
   for(int i = 0; i < boardlen; i++) text(speedcount[i], 1800, 30+i*15);
+  for (int i = events.size(); i > 0; i--){
+    text(events.get(i-1), 5, height-15*(events.size()+1-i));
+  }
 }
 
 void bounce(int b1, int b2){
@@ -139,7 +163,7 @@ void bounce(int b1, int b2){
         nv[b1][1] = -v[b1][1];
       }
       //m[b1] = int(random(1, 2)*m[b1]+1);
-      m[b1]++;
+      //m[b1]++;
       int rand1 = int(sqrt(int(random(r[b1]))));
       int rand2 = int(sqrt(int(random(r[b2]))));
       int steal = abs(rand1-rand2);
@@ -149,7 +173,9 @@ void bounce(int b1, int b2){
           r[b2]--;
         }
         if (r[b2] <= 0){
-          kills[b1]++;          
+          events.append(names[b1] +"("+kills[b1]+ ") has killed " + names[b2]+"("+kills[b2]+")");
+          if(events.size()>boardlen) events.remove(0);
+          kills[b1]++;
         }
       }
       
@@ -166,24 +192,24 @@ void colorBounce(int c1, int c2){
 }
 
 int[] rotateU(int[] source){
-  int[] nw = new int[source.length];
-  for (int i = 0; i < source.length; i++){
-    nw[(i+1)%(source.length)] = source[i];
+  int[] nw = new int[end];
+  for (int i = 0; i < end; i++){
+    nw[(i+1)%(end)] = source[i];
   }
   return nw;
 }
 int[][] rotateN(int[][] source){
-  int[][] nw = new int[source.length][source[0].length];
-  for (int i = 0; i < source.length; i++){
-    nw[(i+1)%(source.length)] = source[i];
+  int[][] nw = new int[end][source[0].length];
+  for (int i = 0; i < end; i++){
+    nw[(i+1)%(end)] = source[i];
   }
   return nw;
 }
 
 String[] rotateS(String[] source){
-  String[] nw = new String[source.length];
-  for (int i = 0; i < source.length; i++){
-    nw[(i+1)%(source.length)] = source[i];
+  String[] nw = new String[end];
+  for (int i = 0; i < end; i++){
+    nw[(i+1)%(end)] = source[i];
   }
   return nw;
 }
@@ -197,6 +223,7 @@ void massRot(){
   r = rotateU(r);
   names = rotateS(names);
   kills = rotateU(kills);
+  karma = rotateU(karma);
 }
 
 int count(){
@@ -212,7 +239,7 @@ String[] rank(int[] stat, int amount){
   int[] maxes = new int[amount];
   for (int i = 0; i < amount; i++){
     int[] max = {0, -1};
-    for (int j = 0; j < stat.length; j++){
+    for (int j = 0; j < end; j++){
       boolean done = false;
       for (int m = 0; m < maxes.length; m++){
         if (maxes[m] == j) done = true;
