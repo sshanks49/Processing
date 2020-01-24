@@ -104,14 +104,17 @@ void draw() {
         //m[i]++;
       }
     }
-  }
-  for (int i = 0; i < c.length; i++){
     if (c[i][0] + cv[i][0] > 255) cv[i][0] = -1;
     if (c[i][0] + cv[i][0] < 0) cv[i][0] = 1;
     if (c[i][1] + cv[i][1] > 255) cv[i][1] = -1;
     if (c[i][1] + cv[i][1] < 0) cv[i][1] = 1;
     if (c[i][2] + cv[i][2] > 255) cv[i][2] = -1;
     if (c[i][2] + cv[i][2] < 0) cv[i][2] = 1;
+    p[i][0] += v[i][0]*m[i];
+    p[i][1] += v[i][1]*m[i];
+    c[i][0] += cv[i][0];
+    c[i][1] += cv[i][1];
+    c[i][2] += cv[i][2];
   }
   if (b[0] + bv[0] > 255) bv[0] = -1;
   if (b[0] + bv[0] < 0) bv[0] = 1;
@@ -119,13 +122,6 @@ void draw() {
   if (b[1] + bv[1] < 0) bv[1] = 1;
   if (b[2] + bv[2] > 255) bv[2] = -1;
   if (b[2] + bv[2] < 0) bv[2] = 1;
-  for( int i = 0; i < p.length; i++){
-    p[i][0] += v[i][0]*m[i];
-    p[i][1] += v[i][1]*m[i];
-    c[i][0] += cv[i][0];
-    c[i][1] += cv[i][1];
-    c[i][2] += cv[i][2];
-  }
   b[0] += bv[0];
   b[1] += bv[1];
   b[2] += bv[2];
@@ -138,8 +134,8 @@ void draw() {
   String[] sizecount = rank(r, boardlen);
   text("Radius", 1000, 15);
   for(int i = 0; i < boardlen; i++) text(sizecount[i], 1000, 30+i*15);
-  text("Speed", 1800, 15);
-  String[] speedcount = rank(m, boardlen);
+  text("Karma", 1800, 15);
+  String[] speedcount = rank(karma, boardlen);
   for(int i = 0; i < boardlen; i++) text(speedcount[i], 1800, 30+i*15);
   for (int i = events.size(); i > 0; i--){
     text(events.get(i-1), 5, height-15*(events.size()+1-i));
